@@ -1,0 +1,5 @@
+*.pdf
+\D
+.vscode
+__pycache__
+[0-9]*
