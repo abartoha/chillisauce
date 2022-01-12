@@ -3,6 +3,9 @@ from os import listdir, mkdir, path
 import os
 import requests
 
+#constants
+ATTEMPTS = 10
+
 # def download_to_folder(sauce, count):
 #     if sauce not in listdir:
 #         makedir(sauce)
@@ -31,19 +34,31 @@ import requests
 def download(code, count, photoCode, x):
     if str(code) not in listdir():
         mkdir(str(code))
-    if x > 10:
+    if (f"{addZeros(count)}.jpg" in listdir(f"{code}")) or  (f"{addZeros(count)}.png" in listdir(f"{code}")):
+        print("Same photo already there")
+        return 4
+    if x > ATTEMPTS:
         return -1
     headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
     url = f"https://t.dogehls.xyz/galleries/{str(photoCode)}/{str(count)}.jpg"
     response = requests.get(url, stream=True, headers = headers)
+    if response.headers['Content-Type'] == 'text/html':
+        url = f"https://t.dogehls.xyz/galleries/{str(photoCode)}/{str(count)}.png"
+        response = requests.get(url, stream=True, headers = headers)
     total_size_in_bytes= int(response.headers.get('content-length', 0))
-    if f"{addZeros(count)}.jpg" in listdir(f"{code}"):
+    if f"{addZeros(count)}.jpg" in listdir(f"{code}") or f"{addZeros(count)}.png" in listdir(f"{code}"):
         if f'{addZeros(count)}.jpg' in listdir(str(code)) and os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") == total_size_in_bytes:
             print("Same size, photo already downloaded")
             return 0
-        if os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") < total_size_in_bytes:
+        elif f'{addZeros(count)}.png' in listdir(str(code)) and os.path.getsize(f"{code}/{addZeros(count)}.png") is not None and os.path.getsize(f"{code}/{addZeros(count)}.png") == total_size_in_bytes:
+            print("Same PNG size, photo already downloaded")
+            return 0
+        elif os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") < total_size_in_bytes:
             print("Existing file not in proper shape, redownloading")
-    if total_size_in_bytes < 662:
+        elif os.path.getsize(f"{code}/{addZeros(count)}.png") is not None and os.path.getsize(f"{code}/{addZeros(count)}.png") < total_size_in_bytes:
+            print("Existing PNG file not in proper shape, redownloading")
+    if total_size_in_bytes < 1:
+        # TODO: change the bvalue to see anomalies
         # NOTE: this possible recursion hell is pretty nasty
         # better find a fix fast
         print(f"Retrying photo no. {count}, attempt no. {x}")
@@ -75,4 +90,4 @@ def addZeros2(number, lim):
     return (10**lim) // number
 
 if __name__ == "__main__":
-    print(addZeros2(1, 4))
+    download(123, 14, 1571013, 1)

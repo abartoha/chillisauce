@@ -1,5 +1,5 @@
 import pprint
-from os import listdir
+from os import listdir, remove
 from PIL import Image
 from pdfrw import PdfReader, PdfWriter, IndirectPdfDict
 
@@ -13,9 +13,13 @@ def makepdf(sauce, metadata):
             imglist.append(Image.open(path).convert("RGB"))
         except Exception:
             print(f"Page {imageCount} wasn't found or corrupted")
+    if imglist == []:
+        return -1
     img0 = imglist[0]
     img0.save(f"{sauce}.pdf", save_all=True, append_images=imglist[1:])
     addMeta(f"{sauce}.pdf", metadata)
+    remove(f"{sauce}.pdf")
+    return 0
 
 
 def addMeta(filename, meta):
@@ -43,7 +47,7 @@ def addMeta(filename, meta):
     # assert inputs
     # outfn = "cat." + os.path.basename(inputs[0])
 
-    writer = PdfWriter(f'X{filename}')
+    writer = PdfWriter(fileNameWindows(meta['Title'])+".pdf")
     writer.addpages(PdfReader(f'{filename}').pages)
 
     writer.trailer.Info = IndirectPdfDict(
@@ -53,6 +57,15 @@ def addMeta(filename, meta):
         Subject=meta['Groups']
     )
     writer.write()
+
+def fileNameWindows(name, r=" x "):
+    # WARNING: this might cause unexpected behavior
+    # this fuction makes a string compatible with the file naing scheme of windows perating system
+    new_name = ""
+    for i in name:
+        if i in "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z 1 2 3 4 5 6 7 8 9 0 [ ] ( ) ! . , - + _".split(" "):
+            new_name += i
+    return new_name
 
 # def makepdf(sauce):
 #     pdf = FPDF()
@@ -70,3 +83,5 @@ def addMeta(filename, meta):
 
 if __name__ == "__main__":
     makepdf(374304)
+    
+    
