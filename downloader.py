@@ -29,19 +29,20 @@ import requests
 #         console.print("Already downloaded\t[yellow]"+i[1]+"[/yellow]", style=already_downloaded_style)
 
 def download(code, count, photoCode, x):
+    if str(code) not in listdir():
+        mkdir(str(code))
     if x > 10:
         return -1
     headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
     url = f"https://t.dogehls.xyz/galleries/{str(photoCode)}/{str(count)}.jpg"
     response = requests.get(url, stream=True, headers = headers)
     total_size_in_bytes= int(response.headers.get('content-length', 0))
-    if str(code) not in listdir():
-        mkdir(str(code))
-    if f'{addZeros(count)}.jpg' in listdir(str(code))and os.path.getsize(f"{code}/{addZeros(count)}.jpg") == total_size_in_bytes:
-        print("Same size, photo already downloaded")
-        return 0
-    if os.path.getsize(f"{code}/{addZeros(count)}.jpg") < total_size_in_bytes:
-        print("Existing file not in proper shape, redownloading")
+    if f"{addZeros(count)}.jpg" in listdir(f"{code}"):
+        if f'{addZeros(count)}.jpg' in listdir(str(code)) and os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") == total_size_in_bytes:
+            print("Same size, photo already downloaded")
+            return 0
+        if os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") < total_size_in_bytes:
+            print("Existing file not in proper shape, redownloading")
     if total_size_in_bytes < 662:
         # NOTE: this possible recursion hell is pretty nasty
         # better find a fix fast
