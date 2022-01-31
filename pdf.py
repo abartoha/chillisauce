@@ -6,7 +6,12 @@ from pdfrw import PdfReader, PdfWriter, IndirectPdfDict
 
 def makepdf(sauce, metadata):
     imglist = []
-    for imageCount in listdir(str(sauce)):
+    sorted_list_dir = listdir(str(sauce)) 
+    sorted_list_dir.sort()
+    # adding this after testing this on arch linus
+    # apparantly arch linux returns 00-7.jpg first, 
+    # then 0015.jpg I don't know why tf
+    for imageCount in sorted_list_dir:
         print(imageCount + " added into the pdf")
         path = f"{str(sauce)}/{imageCount}"
         try:
