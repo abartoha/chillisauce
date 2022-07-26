@@ -31,20 +31,23 @@ ATTEMPTS = 10
 #     else:
 #         console.print("Already downloaded\t[yellow]"+i[1]+"[/yellow]", style=already_downloaded_style)
 
-def download(code, count, photoCode, x):
+def download(code, count, photoCode, x, baseLink, imgFormat):
     if str(code) not in listdir():
         mkdir(str(code))
     if (f"{addZeros(count)}.jpg" in listdir(f"{code}")) or  (f"{addZeros(count)}.png" in listdir(f"{code}")):
         print("Same photo already there")
-        return 4
+        #return 4
+        pass
     if x > ATTEMPTS:
-        return -1
+        #return -1
+        pass
     headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
-    url = f"https://t.dogehls.xyz/galleries/{str(photoCode)}/{str(count)}.jpg"
+    url = f"{baseLink}/{str(photoCode)}/{str(count)}{imgFormat}"
+    # print(url)
     response = requests.get(url, stream=True, headers = headers)
-    if response.headers['Content-Type'] == 'text/html':
-        url = f"https://t.dogehls.xyz/galleries/{str(photoCode)}/{str(count)}.png"
-        response = requests.get(url, stream=True, headers = headers)
+    # if response.headers['Content-Type'] == 'text/html':
+    #     url = f"{baseLink}/{str(photoCode)}/{str(count)}.png"
+    #     response = requests.get(url, stream=True, headers = headers)
     total_size_in_bytes= int(response.headers.get('content-length', 0))
     if f"{addZeros(count)}.jpg" in listdir(f"{code}") or f"{addZeros(count)}.png" in listdir(f"{code}"):
         if f'{addZeros(count)}.jpg' in listdir(str(code)) and os.path.getsize(f"{code}/{addZeros(count)}.jpg") is not None and os.path.getsize(f"{code}/{addZeros(count)}.jpg") == total_size_in_bytes:
@@ -62,10 +65,11 @@ def download(code, count, photoCode, x):
         # NOTE: this possible recursion hell is pretty nasty
         # better find a fix fast
         print(f"Retrying photo no. {count}, attempt no. {x}")
-        download(code, count, photoCode, x+1)
-        return 3
+        download(code, count, photoCode, x+1, baseLink, imgFormat)
+        #return 3
+        pass 
     block_size = 1024 #1 Kibibyte
-    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, leave=False, desc=f"{code}")
     with open(f'{code}/{addZeros(count)}.jpg', 'wb') as file:
         for data in response.iter_content(block_size):
             progress_bar.update(len(data))
@@ -73,7 +77,7 @@ def download(code, count, photoCode, x):
     progress_bar.close()
     if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
         print("DOWNLOAD ERROR, something went wrong")
-        download(code, count, photoCode, x+1)
+        download(code, count, photoCode, x+1, baseLink, imgFormat)
         return 3
     x = 0
     return 0
@@ -90,4 +94,5 @@ def addZeros2(number, lim):
     return (10**lim) // number
 
 if __name__ == "__main__":
-    download(123, 14, 1571013, 1)
+    # download(123, 14, 1571013, 1)
+    pass

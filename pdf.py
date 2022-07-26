@@ -2,6 +2,7 @@ import pprint
 from os import listdir, remove
 from PIL import Image
 from pdfrw import PdfReader, PdfWriter, IndirectPdfDict
+from tqdm import tqdm
 
 
 def makepdf(sauce, metadata):
@@ -11,8 +12,8 @@ def makepdf(sauce, metadata):
     # adding this after testing this on arch linus
     # apparantly arch linux returns 00-7.jpg first, 
     # then 0015.jpg I don't know why tf
-    for imageCount in sorted_list_dir:
-        print(imageCount + " added into the pdf")
+    for imageCount in tqdm(sorted_list_dir, leave=False, unit="Photo(s)", desc=f"Making PDF"):
+        # print(imageCount + " added into the pdf")
         path = f"{str(sauce)}/{imageCount}"
         try:
             imglist.append(Image.open(path).convert("RGB"))
@@ -29,7 +30,7 @@ def makepdf(sauce, metadata):
 
 def addMeta(filename, meta):
     # TODO: comment this line soon
-    print("Writing PDF metadata")
+    # print("Writing PDF metadata")
     # pdf_reader = PdfReader(filename)
     # metadata = PdfDict(meta)
     # pdf_reader.Info.update(metadata)

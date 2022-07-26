@@ -5,6 +5,7 @@ class Page:
     """
     _version 0.1_
     Boilerplate code for bs4-requests web scraping summarized into a class
+    very outdates, shouldn't have used it as a class, but a function
     """
     headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
     parser = 'html.parser'
